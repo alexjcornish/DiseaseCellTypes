@@ -3,9 +3,11 @@ DiseaseCellTypes
 
 An R-package for the identification of disease-associated cell types using cell type-specific interactomes. This package provides 2 methods for identifying disease-cell type associations: gene set compactness (GSC) and gene set overexpression (GSO). Also provided are functions for building cell type-specific interactomes and cell type-based diseasomes.
 
-Details on how to run the methods and recreate the results of the referenced paper are provided in the package vignette (note, this html file may need to be saved and reopened if it does not initially display correctly): https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-vignette.html?raw=TRUE
+Details on how to run the methods and recreate the results of the referenced paper are provided in the package vignette: https://cdn.rawgit.com/alexjcornish/DiseaseCellTypes/master/inst/doc/DiseaseCellTypes-vignette.html?raw=TRUE
 
 Further details on each of the functions contained within the package are available within the package manual: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
+
+Note: if either of these files do not download correctly, they are also contained within the package itself.
 
 
 Additional data
