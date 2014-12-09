@@ -5,7 +5,7 @@ An R-package for the identification of disease-associated cell types using cell 
 
 Details on how to run the methods and recreate the results of the referenced paper are provided in the package vignette (note, this html file may need to be saved and reopened if it does not initially display correctly): https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-vignette.html?raw=TRUE
 
-Further details on each of the functions contained within the packages are available in the package manual: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
+Further details on each of the functions contained within the package are available within the package manual: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
 
 
 Additional data
