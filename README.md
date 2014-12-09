@@ -21,11 +21,11 @@ Download package
 
 Stable package binaries can be downloaded from the following URLs. 
 
-Mac OS/X binary:
+Mac OS/X binary: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.tgz?raw=TRUE
 
-Windows binary:
+Windows binary: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.zip?raw=TRUE
 
-Source package:
+Source package: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.tar.gz?raw=TRUE
 
 
 Development
