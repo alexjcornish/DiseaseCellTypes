@@ -21,19 +21,19 @@ knit_hooks$set(printfun = function(before, options, envir) {
 set.seed(999) # for reproducibility
 require(DiseaseCellTypes)
 
-# load STRING PPI data
+# load PPI data
 data(edgelist.string)
 edgelist.string[1:2, ]
 
 # create igraph object
-g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 
 ## ----transform_expression------------------------------------------------
 # load FANTOM5 gene expression data
 data(expression.fantom5)
 expression.fantom5[1:3, 1:2]
 
-# transform to percentile-normlized relative expression scores
+# transform to percentile-normlized relative gene expression scores
 expression <- expression.transform(expression.fantom5)
 expression[1:3, 1:2]
 
@@ -78,7 +78,7 @@ plot(res.gso)
 ## ----create_neuron_interactome-------------------------------------------
 # create global network
 data(edgelist.string)
-g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 
 # load and transform expression data
 data(expression.fantom5)
@@ -104,7 +104,7 @@ V(g.neuron)$expression[1:5]
 # 
 # # load and create global network
 # data(edgelist.string)
-# g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+# g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 # genes.g <- V(g)$name
 # 
 # # load and format gene expression data
@@ -186,34 +186,34 @@ res["not supported by text", "GSC"] <- sum(pvalues.adj.gsc < cutoff & !pvalues.a
 res
 
 ## ----diseasome, results="asis"-------------------------------------------
-# load the disease classes
-data(disease.classes)
-col.other <- "white"
-
-# set colours for each of the classes
-classes <- sort(unique(disease.classes))
-classes.cols <- structure(rep(col.other, length(classes)), names=classes)
-classes.cols["Cardiovascular Diseases"] <- "red"
-classes.cols["Digestive System Diseases"] <- "orange"
-classes.cols["Immune System Diseases"] <- "yellow"
-classes.cols["Mental Disorders"] <- "lightgreen"
-classes.cols["Musculoskeletal Diseases"] <- "darkgreen"
-classes.cols["Nutritional and Metabolic Diseases"] <- "blue"
-classes.cols["Skin and Connective Tissue Diseases"] <- "purple"
-classes.cols["Urogenital Diseases and Pregnancy Complications"] <- "pink"
-
-# identify the class color for each disease
-disease.cols <- classes.cols[disease.classes]
-names(disease.cols) <- names(disease.classes)
-
-# create cell type diseasome
-project.network(pvalues.gsc, col.vert=disease.cols, col.other=col.other, vert.size.max=5, vert.label.cex=0.6, edge.width.max=5, layout=layout.fruchterman.reingold) 
-project.network.legend(classes.cols, col.other)
+# # load the disease classes
+# data(disease.classes)
+# col.other <- "white"
+# 
+# # set colours for each of the classes
+# classes <- sort(unique(disease.classes))
+# classes.cols <- structure(rep(col.other, length(classes)), names=classes)
+# classes.cols["Cardiovascular Diseases"] <- "red"
+# classes.cols["Digestive System Diseases"] <- "orange"
+# classes.cols["Immune System Diseases"] <- "yellow"
+# classes.cols["Mental Disorders"] <- "lightgreen"
+# classes.cols["Musculoskeletal Diseases"] <- "darkgreen"
+# classes.cols["Nutritional and Metabolic Diseases"] <- "blue"
+# classes.cols["Skin and Connective Tissue Diseases"] <- "purple"
+# classes.cols["Urogenital Diseases and Pregnancy Complications"] <- "pink"
+# 
+# # identify the class color for each disease
+# disease.cols <- classes.cols[disease.classes]
+# names(disease.cols) <- names(disease.classes)
+# 
+# # create cell type diseasome
+# project.network(pvalues.gsc, col.vert=disease.cols, col.other=col.other, vert.size.max=5, vert.label.cex=0.6, edge.width.max=5, layout=layout.fruchterman.reingold) 
+# project.network.legend(classes.cols, col.other)
 
 ## ----create_monocyte_interactome-----------------------------------------
 # create global network
 data(edgelist.string)
-g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 
 # load expression data
 data(expression.fantom5)
@@ -239,31 +239,6 @@ psoriasis.genes <- psoriasis.genes[degree(g.monocyte)[psoriasis.genes] <= 15]
 # in the paper, 500 bins, rather than 20 are used
 g.subgraph <- disease.subgraph(g.monocyte, psoriasis.genes, n.bins=20, edge.width.max=10)
 plot(g.subgraph)
-
-## ----edge_enrichment-----------------------------------------------------
-# setup
-edge.attr <- "score"
-n.perm <- 20
-edge.cutoff <- 0.9 # edges with weight higher than 0.9 are within the top 1% of monocyte edge
-proportion.perm <- rep(NA, n.perm)
-
-# create observed subgraph
-g.subgraph.obs <- disease.subgraph(g.monocyte, psoriasis.genes, edge.attr=edge.attr, n.bins=20, edge.width.max=10)
-proportion.obs <- mean(get.edge.attribute(g.subgraph.obs, edge.attr) > edge.cutoff)
-
-for (n in 1:n.perm) {
-    # create permuted subgraph
-    expression.cell <- structure(sample(expression[, "monocyte"]), names=rownames(expression))
-    g.monocyte.perm <- score.edges(g, expression.cell)
-    g.subgraph.perm <- disease.subgraph(g.monocyte.perm, psoriasis.genes, edge.attr=edge.attr, n.bins=20, edge.width.max=10)
-    
-    # compute proportion of edges with weights created than edge.cutoff
-    proportion.perm[n] <- mean(get.edge.attribute(g.subgraph.perm, edge.attr) > edge.cutoff)    
-}
-
-# compute empirical p-value
-# we set the lower limit of the p-value as 1/n.perm
-max(mean(proportion.perm >= proportion.obs), 1/n.perm)
 
 ## ----session_info--------------------------------------------------------
 sessionInfo()
