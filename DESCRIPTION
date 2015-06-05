@@ -2,7 +2,7 @@ Package: DiseaseCellTypes
 Type: Package
 Title: Identify disease-cell type associations using cell type-specific
         interactomes.
-Version: 0.9.0
+Version: 0.10.0
 Date: 9 December 2014
 Author: Alex J. Cornish
 Maintainer: Alex J. Cornish <a.cornish12@imperial.ac.uk>

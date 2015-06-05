@@ -1,9 +1,9 @@
 DiseaseCellTypes
 ==========
 
-An R-package for identifying disease-associated cell types using cell type-specific interactomes. This package provides 2 methods for identifying disease-cell type associations: gene set compactness (GSC) and gene set overexpression (GSO). Also provided are functions for building cell type-specific interactomes and cell type-based diseasomes.
+An R-package for identifying disease-associated cell types using cell type-specific interactomes. This package provides 2 methods for identifying disease-cell type associations: gene set compactness (GSC) and gene set overexpression (GSO). Also provided are functions for recreating the results from Cornish et al.
 
-How to run the methods and recreate the results of the referenced paper is described in the [package vignette][1]. Further details on each of the package functions are available in the [package manual][2]. Both the [package vignette][1] and [package manual][2] are contained within the package. 
+How to run the methods and recreate the results of Cornish et al. is described in the [package vignette][1]. The [package manual][2] contains additional information about each of the functions. Both the [package vignette][1] and [package manual][2] are contained within the package. 
 
 
 Additional data
@@ -36,7 +36,7 @@ install_github("alexjcornish/DiseaseCellTypes")
 References
 ----------
 
-Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. (Under Revision)
+Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. (under revision)
 
 [1]: https://cdn.rawgit.com/alexjcornish/DiseaseCellTypes/master/inst/doc/DiseaseCellTypes-vignette.html?raw=TRUE
 [2]: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
