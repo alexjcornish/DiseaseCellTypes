@@ -6,7 +6,6 @@
 \alias{pvalues.gsc}
 \alias{pvalues.gso}
 \alias{pvalues.text}
-\alias{pvalues.text.large}
 \alias{res.gsc}
 \title{
 Pre-processed data sets for the DiseaseCellTypes vignette
@@ -17,18 +16,17 @@ Pre-processed text-mining, gene expression, network and disease data and results
 \details{
 \describe{
 \item{disease.classes}{Classes of diseases represented within \code{disease.genes}. Classes were found by mapping each disease to a MeSH term and identifying ancestors at the second level of the MeSH ontology. When diseases map to multiple MeSH terms, the most frequently-occuring MeSH term is selected.}
-\item{disease.genes}{Disease-associated genes obtained from GAD and UNIPROT through the DisGeNET database (version 2.1). Associations with a score less than 0.0035 have been removed. DisGeNET data is made available from the DisGeNET website (http://www.disgenet.org/) under the Open Database License.}
-\item{edgelist.string}{Protein-protein interactions obtained from the STRING database (version 9.1, downloaded on 2014-09-08). Each interaction in the STRING database is associated with a score, representing the strength of evidence for the interaction. To reduce the density of the network, only interactions with a score greater than 800 have been included. Interactor IDs have been mapped to Ensembl gene IDs. STRING data is freely available from the STRING website (http://string-db.org) under the Creative Commons Attribution 3.0 License.}
-\item{expression.fantom5}{Normalized gene-wise expression counts for primary cell types from the FANTOM5 project. Samples have been grouped based on their expression profile and morphological information, as described in the accompanying paper. Normalization was conducted using the RLE method implemented within the edgeR package. FANTOM5 data is made available from the FANTOM5 project website (http://fantom.gsc.riken.jp/) under the Creative Common Attribute 4.0 International license.}
-\item{pvalues.gsc}{Disease-cell type association p-values computed using the gene set compactness (GSC) method. 100 diseases (from DisGeNET), 73 cell types (from FANTOM5) were tested using PPI data (from STRING). 10000 permutations were completed.}
-\item{pvalues.gso}{Disease-cell type association p-values computed using the gene set overexpression (GSO) method. 100 diseases (from DisGeNET) and 73 cell types (from FANTOM5) were tested. 10000 permutations were completed.}
-\item{pvalues.text}{Disease-cell type association p-values computed using the text-mining method. 100 diseases (from DisGeNET) and 73 cell types (from FANTOM5) were tested. P-values represent the significance of the co-occurance of diseases and cell types in PubMed articles. This was done by mapping diseases (from DisGeNET) and cell types (from FANTOM5) to MeSH terms and querying the PubMed database using these terms. P-values are computed using Fisher's exact test, as described by Cheung et al. Text mining was completed on 2014-08-31. On some occasions, multiple diseases and cell types are mapped to the same MeSH term, leading to identical rows and columns.}
-\item{pvalues.text.large}{Larger matrix of disease-cell type association p-values computed using the text-mining method. 406 diseases (from DisGeNET) and 157 cell types (from FANTOM5) were tested. This matrix includes all of the associations contained within \code{pvalues.text}.}
+\item{disease.genes}{Disease-associated genes obtained from the DisGeNET database (version 2.1). These associations have been filtered, as described in Cornish et al. (2015). DisGeNET data is available from the DisGeNET website (http://www.disgenet.org/) under the Open Database License.}
+\item{edgelist.string}{Protein-protein interactions from the STRING database (version 9.1, downloaded on 2014-09-08). Only physical interactions with a confidence score greater than 0.8 have been included. Protein identifiers have been mapped to Ensembl gene identifiers. STRING data is freely available from the STRING website (http://string-db.org) under the Creative Commons Attribution 3.0 License.}
+\item{expression.fantom5}{Normalized gene-wise expression counts for primary cell types from the FANTOM5 project. Samples have been normalized, grouped and combined, as described in Cornish et al. (2015). FANTOM5 data is made available from the FANTOM5 project website (http://fantom.gsc.riken.jp/) under the Creative Common Attribute 4.0 International license.}
+\item{pvalues.gsc}{Disease-cell type association p-values computed using the gene set compactness (GSC) method. 10000 permutations were used.}
+\item{pvalues.gso}{Disease-cell type association p-values computed using the gene set overexpression (GSO) method. 10000 permutations were used.}
+\item{pvalues.text}{Disease-cell type association p-values computed using the text-mining method. Text mining was completed on 2014-08-31. On some occasions, multiple diseases and cell types are mapped to the same MeSH term, leading to identical rows and columns.}
 \item{res.gsc}{Output of the \code{gene.set.compactness} function for use in vignette example.}
 }
 }
 \references{
-Our paper in prepartion. 
+Our paper in preparation. 
 
 Bauer-Mehren, A., Rautschka, M., Sanz, F. et al. (2010). \emph{DisGeNET: a Cytoscape plugin to visualize, integrate, search and analyze gene-disease networks.} Bioinformatics. 26, 2924-6.
 

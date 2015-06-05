@@ -1,9 +1,8 @@
 Package: DiseaseCellTypes
 Type: Package
-Title: Identify disease-cell type associations using cell type-specific
-        interactomes.
+Title: Identify disease-cell type associations using GSC and GSO
 Version: 0.10.0
-Date: 9 December 2014
+Date: 5 June 2015
 Author: Alex J. Cornish
 Maintainer: Alex J. Cornish <a.cornish12@imperial.ac.uk>
 Depends: R (>= 2.14), igraph

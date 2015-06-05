@@ -1,10 +1,10 @@
 \name{gene.set.compactness}
 \alias{gene.set.compactness}
 \title{
-Run the gene set compactness method
+Run the gene set compactness (GSC) method
 }
 \description{
-Identify associations between sets of disease-associated genes and context (i.e. cell types) using the gene set compactness method.
+Identify associations between sets of disease-associated genes and cell types using the gene set compactness method.
 }
 \usage{
 gene.set.compactness(expression, genes, g, n.perm=10000, expression.miss=median(expression), 

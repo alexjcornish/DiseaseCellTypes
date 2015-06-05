@@ -4,7 +4,7 @@
 Extract and plot a disease subgraph.
 }
 \description{
-Identify a subgraph that contains disease genes and their interacting partners and plot.
+Plot a subgraph containing disease genes and their interacting partners.
 }
 \usage{
 disease.subgraph(g, genes, edge.attr="score", vert.attr="expression", 
@@ -67,7 +67,7 @@ Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 # create cell type-specific interactome
 data(edgelist.string)
 data(expression.fantom5)
-g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 expression <- expression.transform(expression.fantom5)
 g.myoblast <- score.edges(g, expression[, "myoblast"])
 

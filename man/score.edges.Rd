@@ -57,7 +57,7 @@ Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 # create myoblast-specific interactome using FANTOM5 expression data
 data(edgelist.string)
 data(expression.fantom5)
-g <- graph.edgelist(as.matrix(edgelist.string[, c("idA", "idB")]), directed=FALSE)
+g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 expression <- expression.transform(expression.fantom5)
 g.myoblast <- score.edges(g, expression[, "myoblast"])
 }
