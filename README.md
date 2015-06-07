@@ -42,6 +42,6 @@ Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular 
 [2]: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
 [3]: http://alexjcornish.github.io/Disease_Cell_Association_Data/
 [4]: http://alexjcornish.github.io/Cell_Type_Interactomes/
-[5]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.tgz?raw=TRUE
-[6]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.zip?raw=TRUE
-[7]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.9.0.tar.gz?raw=TRUE
+[5]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.tgz?raw=TRUE
+[6]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.zip?raw=TRUE
+[7]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.tar.gz?raw=TRUE
