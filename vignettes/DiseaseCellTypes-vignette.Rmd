@@ -14,76 +14,66 @@ knit_hooks$set(printfun = function(before, options, envir) {
     txt = capture.output(dump(options$printfun, '', envir = envir))
     ## reformat if tidy=TRUE
     if (options$tidy)
-        txt = tidy.source(text=txt, output=FALSE,
-                          width.cutoff=30L, keep.comment=TRUE,
-                          keep.blank.line=FALSE)$text.tidy
+        txt = tidy.source(text=txt, output=FALSE, width.cutoff=30L, keep.comment=TRUE, keep.blank.line=FALSE)$text.tidy
     paste(c('\n```r\n', txt, '\n```\n'), collapse="\n")
-    })
+})
 ```
 
 
-
 # Vignette for DiseaseCellTypes
-## Alex J. Cornish
-
+#### Alex J. Cornish
 ## Introduction
 
 This vignette explains how to use the **DiseaseCellTypes** package to identify disease-cell type associations and reproduce the results of Cornish et al. (2015).
 
-Two method are implemented within the package: 
+Two methods are implemented within the **DiseaseCellTypes** package: 
 - Gene set compactness (GSC)
 - Gene set overexpression (GSO)
 
-The performance of these two methods is compared in Cornish et al. (2015). The code contained within this vignette, along with the data provided within the **DiseaseCellTypes** package, also allows the user to reproduce the results of Cornish et al. (2015). Due to the time required to reproduce the results in full, much of this code is commented.
-
+The performance of these two methods is analysed in Cornish et al. (2015). The code contained within this vignette, along with the data provided within the **DiseaseCellTypes** package, allows users to reproduce the results of Cornish et al. (2015). Due to the time required to reproduce the results in full, some of this code is commented out. However, it can be uncommented and run as required.
 
 
 ## Overview of the GSC method
+The GSC method identifies cell types associated with diseases by comparing the clustering of disease-associated genes across cell type-specific interactomes. While only associations between diseases and cell types are identified in this vignette, the GSC method can also be used to identify associations with other biological entities, such as tissues. 
 
-As described in Cornish et al. (2015), the GSC method identifies cell types associated with diseases by comparing the clustering of disease-associated genes across cell type-specific interactomes. While we only identify disease-cell type associations in this vignette, the GSC method is not restricted to cell types and can be used to identify associations with other biological entities, such as tissues. 
+The GSC method is based on the compactness function; defined by Glaab et al. (2010) as the mean distance between pairs of vertices in a set of vertices on a graph. Through a permutation-based approach, it is possible to use the compactness score to identify networks within which sets of vertices cluster (Cornish et al. 2014). Here we use random walks with restart (RWR, Kohler et al. 2008) to compute distances between vertex pairs.
 
-The method is based on the compactness score; defined by Glaab et al. (2010) as the mean distance between pairs of vertices in a set of vertices on a graph. Through a permutation-based approach, it is possible to use the compactness score to identify networks within which sets of vertices cluster (Cornish et al. 2014). Here we use random walks with restart (RWR) to compute distances between vertex pairs, similar to the method described by Kohler et al (2008). 
+Cell type-specific interactomes are created by integrating expression data with protein-protein interaction (PPI) data. Edges are re-scored using the product of the percentile-normalised relative expression scores. In this vignette, we use gene expression data from  the FANTOM5 project (Forrest et al. 2014), PPI data from the STRING database (Franceschini et al. 2013) and disease-gene associations from the DisGeNET database (Bauer-Mehren et al. 2010). 
 
-Cell type-specific interactomes are created by integrating expression data with protein-protein interaction (PPI) data. Edges are re-scored using the product of the percentile-normalised relative expression scores. This is similar to the edge reweight method of Magger et al (2012). However, rather than using cutoff expression scores, this method uses continuous relative expression scores. In this vignette, we use gene expression data from 73 cell types from the FANTOM5 project (Forrest et al. 2014). PPI data is taken from the STRING database (Franceschini et al. 2013). Disease-gene associations are taken from the DisGeNET database (Bauer-Mehren et al. 2010). 
-
-A cell type-specific interactome is created for each of the cell types. These are referred to as the observed interactomes. In order to determine whether a disease-associated gene set is more compact in the observed interactome that expected by chance, permuted interactomes are created by permuting the percentile-normalized expression scores and using these profiles to create permuted interactomes. The compactness score of the disease-associated gene set is computed for each observed and permuted interactome and an empirical p-value produced by counting the number of permuted compactness scores smaller than each observed score. 
+A cell type-specific interactome is created for each of the cell types. These are referred to as the observed interactomes. In order to determine whether a disease-associated gene set is more compact in each observed interactome than expected by chance, permuted interactomes are created by permuting the percentile-normalized expression scores and using these scores to create permuted interactomes. The compactness score of the disease-associated gene set is computed for each observed and permuted interactome and an empirical p-value produced by counting the number of permuted scores smaller than each observed score. 
 
 ![overview](overview_figure.png)
 
 
-
-## Guide to identifying disease-associated cell types
-
+## Guide to identifying disease-cell type associations
 In this section, we will describe how to transform raw gene expression values to percentile-normalized relative gene expression scores, create a global interactome using the **igraph** package (Csardi et al. 2006) and identify disease-associated cell types using the GSC and GSO methods.
 
 
-
-### Formatting the global interactome
-
+### Creating the global interactome
 The PPI data used by the GSC method should be in the format of an **igraph** object. Gene names should be present under the vertex attribute **name**. It is not necessary to create the cell type-specific interactomes to run the GSC method, as they are created within the **gene.set.compactness** function. However, cell type-specific interactomes can be created separately using the **score.edges** function for other uses.
 
 ```{r create_network}
+# for reproducibility
+set.seed(1)
+
 # load DiseaseCellTypes package
-set.seed(999) # for reproducibility
 require(DiseaseCellTypes)
 
 # load PPI data
 data(edgelist.string)
-edgelist.string[1:2, ]
+edgelist.string[1:3, ]
 
 # create igraph object
 g <- graph.edgelist(as.matrix(edgelist.string[, c("ID.A", "ID.B")]), directed=FALSE)
 ```
 
 
+### Normalizing the gene expression values
+Before running the GSC or GSO methods, it is necessary to produce a matrix of percentile-normalized relative gene expression scores. Each row in this matrix should represent a gene and each column a cell type. 
 
-### Normalizing gene expression values
+The FANTOM Consortium make their gene expression data available for download. This data is provided as expression counts for transcription start sites (TSS), rather than genes. We have converted the TSS-wise expression values to gene-wise values by summing the scores of the TSSs associated with each gene (Sardar et al. 2014). This data has been saved within the **DiseaseCellTypes** package. 
 
-Before running the GSC or GSO methods, it is first necessary to produce a matrix of percentile-normalized relative gene expression scores. Each row in this matrix should represent a gene and each column a cell type. 
-
-The FANTOM5 project make their gene expression data available for download. This data is provided as expression counts for transcription start sites (TSS), rather than genes. We have converted the TSS-wise expression values to gene-wise values by summing the scores of the TSSs associated with each gene (Sardar et al. 2014). This data has been saved within the **DiseaseCellTypes** package. 
-
-We will now use the **expression.transform** function to transform these values to percentile-normalized relative expression scores. 
+We will now use the **expression.transform** function to transform the expression values to percentile-normalized relative expression scores. 
 
 ```{r transform_expression}
 # load FANTOM5 gene expression data
@@ -96,26 +86,22 @@ expression[1:3, 1:2]
 ```
 
 
-
-### Identifying disease-associated genes
-
-Disease-gene associations can be obtained from a number of databases, including DisGeNET and OMIM (Hamosh et al. 2005). The **DiseaseCellTypes** package contain disease-gene associations from the DisGeNET database. 
+### Loading the disease-associated genes
+The **DiseaseCellTypes** package contain disease-gene associations from the DisGeNET database. 
 
 ```{r disease_genes}
 # load disease-gene associations
 data(disease.genes)
-disease.genes[["stomach ulcer"]]
+disease.genes[["uveitis, anterior"]]
 ```
 
 
-
 ### Running the GSC method
-
-We will now apply the GSC method to genes known to be associated with bipolar disorder. Due to the time required to run the method (about 10 minutes on a 2.5 GHz Intel Core i5 processor with 8GB of RAM) the code is commented out.
+We will now apply the GSC method to genes known to be associated with bipolar disorder. The code is commented out due to the time required to run.
 
 ```{r gsc}
 # identify cell types associated with panic disorder-
-disease <- "panic disorder"
+disease <- "bipolar disorder"
 genes <- disease.genes[[disease]]
 
 # remove genes not contained within the network
@@ -128,13 +114,13 @@ genes <- genes[genes %in% V(g)$name]
 The results have been saved within the package.
 
 ```{r gsc_load}
-# load the results of the gene.set.compactness function
+# load the previously-computed results
 data(res.gsc)
 ```
 
-Each p-value contained within the **dct** object output by the **gene.set.compactness** function represents the likelihood of observing clustering at least as strong as that observed, given the PPI data and that the context is not associated with the disease. 
+Each p-value contained within the **dct** object output by the **gene.set.compactness** function represents the likelihood of observing clustering at least as strong as that observed, given the PPI data and that the cell type is not associated with the disease. 
 
-By plotting the results, the observed scores can be compared to the permuted scores. The gray histogram represents the distribution of the permuted scores. The red lines represent the observed scores of contexts with p-values less than a given cutoff. By default, this cutoff is **0.05**. When using these results, p-values should be adjusted for multiple testing. The p-values output by the function have not been adjusted.
+The observed scores can be compared to the permuted scores by plotting the **dct** object. The gray histogram represents the distribution of the permuted scores. The red lines represent the observed scores of cell types with p-values less than a given cutoff. By default, this cutoff is **0.05**. When using these results, p-values should be adjusted for multiple testing. The p-values output by the **gene.set.compactness** have not been adjusted.
 
 ```{r gsc_investigate, results="asis"}
 # look at the p-value of the neuron
@@ -145,10 +131,8 @@ plot(res.gsc)
 ```
 
 
-
 ### Running the GSO method
-
-The GSO method is similar to the GSC method, although it does not use cell type-specific interactomes and instead identifies cell types in which the mean expression of the disease-associated genes is higher than expected. Like the GSC method, the GSO method computes an empirical p-value by permuting the gene expression profiles and comparing the observed mean expression score of the disease associated genes to the distribution of permuted mean expression scores.
+The GSO method is similar to the GSC method, although it does not use cell type-specific interactomes and instead identifies cell types in which the mean expression of the disease-associated genes is higher than expected by chance. Like the GSC method, the GSO method computes an empirical p-value by permuting the gene expression scores and comparing the observed mean expression score of the disease-associated genes to the distribution of permuted mean expression scores.
 
 Here we will apply the GSO method to the gene expression data and disease-associated genes used in the previous section. 
 
@@ -168,9 +152,7 @@ plot(res.gso)
 ```
 
 
-
-### Creating cell type-specific interactomes
-
+## Creating cell type-specific interactomes
 Cell type-specific interactomes are created using the **score.edges** function. In this example, we will create a neuron-specific interactome: 
 
 ```{r create_neuron_interactome}
@@ -183,7 +165,7 @@ data(expression.fantom5)
 expression <- expression.transform(expression.fantom5)
 
 # create neuron-specific interactome
-g.neuron <- score.edges(g, expression.fantom5[, "neuron"])
+g.neuron <- score.edges(g, expression[, "neuron"])
 ```
 
 By default, the edge weights are saved under the edge attribute **score** and the gene expression scores under the vertex attribute **expression**. 
@@ -197,26 +179,20 @@ V(g.neuron)$expression[1:5]
 ```
 
 
-
-## Guild to recreating the results of the accompanying paper
-
-In this section, we will provide details of how to recreate the results of Cornish et al. (2015). 
-
-The data required to recreate the results, such as the FANTOM5 gene expression data, STRING PPI data and DisGeNET disease-gene associations are provided within the package. Due to software required to conduct the text mining, it has not been possible to include the code required to rerun the text-mining. However, further details about how to recreate the text mining results can be obtained by e-mailing the author of this vignette (**a.cornish12 at imperial.ac.uk**). The results of the text-mining are included within the package.
+## Guild to recreating the results of Cornish et al. (2015)
+The data required to recreate the results (gene expression data from the FANTOM5 project, PPI data from the STRING database and disease-gene associations from the DisGeNET database) are contained within the **DiseaseCellTypes** package. It has not been possible to include the code required to reproduce the results of the text-mining. However, further details about how to recreate results of the text-mining can be obtained by e-mailing the author of this vignette (**a.cornish12 at imperial.ac.uk**). The results of the text-mining are included within the package.
 
 
-
-### Identifying disease-associated cell types
-
+### Large scale mapping of diseases to cell types
 Both the GSC and GSO method were used to identify the disease-associated cell types. This section contains the code required to rerun this analysis. It is commented out due to the time required to rerun the code.
 
 ```{r recreate_gsc_gso}
 # # parameters 
-# n.diseases <- 100 # number of diseases
+# min.n.genes <- 6 # minumum number of genes for a disease to be tested
 # n.perm <- 10000 # number of permutations
 # rwr.r <- 0.7 # the RWR restart probability  
 # rwr.cutoff <- 1e-5 # the RWR iteration termination cutoff
-# parallel <- 10 # the number of cores to use 
+# parallel <- 4 # the number of cores to use 
 # 
 # # load and create global network
 # data(edgelist.string)
@@ -226,41 +202,24 @@ Both the GSC and GSO method were used to identify the disease-associated cell ty
 # # load and format gene expression data
 # data(expression.fantom5)
 # expression <- expression.transform(expression.fantom5)
-# expression <- expression[rownames(expression) %in% genes.g, ]
 # genes.expression <- rownames(expression)
 #  
 # # load disease-associated genes
 # data(disease.genes)
-# 
-# # remove disease-associated genes not found in network or expression
-# disease.genes <- sapply(disease.genes, function(genes) genes[genes %in% genes.g], simplify=F)
-# disease.genes <- sapply(disease.genes, function(genes) genes[genes %in% genes.expression], simplify=F)
-# 
-# # remove diseases not identified as diseases in MeSH
-# diseases.to.remove <- c("dna damage", "oxidative stress", "impaired cognition", "retinal vascular occlusion")
-# disease.genes <- disease.genes[!names(disease.genes) %in% diseases.to.remove]
-# 
-# # select the 100 diseases with the most disease-associated genes for use
-# disease.genes <- disease.genes[order(sapply(disease.genes, length), decreasing=T)][1:n.diseases]
+# disease.genes <- sapply(disease.genes, function(genes) genes[genes %in% genes.g], simplify=F) # remove disease-associated genes not found in network or expression
+#
+# # select diseases with at least min.n.genes associated genes
+# disease.genes <- disease.genes[sapply(disease.genes, length) >= min.n.genes]
+# diseases <- names(disease.genes)
 # 
 # # for each disease, apply the GSC method
-# res.full.gsc <- list()
-# for (disease in names(disease.genes)) {
-#     res.full.gsc[[disease]] <- gene.set.compactness(expression, disease.genes[[disease]], g, n.perm, rwr.r=rwr.r, rwr.cutoff=rwr.cutoff, parallel=parallel)
-# }
+# pvalues.gsc <- t(sapply(diseases, function(disease) gene.set.compactness(expression, disease.genes[[disease]], g, n.perm, rwr.r=rwr.r, rwr.cutoff=rwr.cutoff, parallel=parallel)$pval))
 # 
 # # for each disease, apply the GSO method
-# res.full.gso <- list()
-# for (disease in names(disease.genes)) {
-#     res.full.gso[[disease]] <- gene.set.overexpression(expression, disease.genes[[disease]], n.perm)
-# }
-# 
-# # convert to patrix of p-values
-# pvalues.gsc <- t(sapply(res.full.gsc, function(disease) disease$pval))
-# pvalues.gso <- t(sapply(res.full.gso, function(disease) disease$pval))
+# pvalues.gso <- t(sapply(diseases, function(disease) gene.set.overexpression(expression, disease.genes[[disease]], n.perm)$pval))
 ```
 
-The results produced using this script were used in the accompanying paper and are saved within the package. We will now load these results and produce a heatmap showing the associations. The heatmap shown in the accompanying paper contains the diseases and cell types involved in at least 2 associations (p < 0.1). Here, for simplicity, we will include only 10 diseases and cell types.
+The results produced using this script were used in the accompanying paper and are saved within the package. We will now load these results and produce a heatmap showing the associations. Here, for simplicity, we will include only 10 diseases and cell types.
 
 ```{r setup_heatmap, results="asis"}
 # load the associations
@@ -278,12 +237,8 @@ heatmap.2(pvalues.ml10[1:10, 1:10], Rowv=TRUE, Colv=TRUE, dendrogram="both", bre
 ```
 
 
-
-### Comparing the results with text mining
-
-Next, we will compare the associations identified by the GSC and GSO methods with the associations identified by the text mining. Since the text-mining identifies cell types affected by a disease, as well as cell types causing a disease, these associations cannot be considered gold standards. However, by comparing the results of the methods, we are able to compare the methods efficacy. 
-
-First, we load the associations.
+### Comparing the GSC and GSO associations with text-mined associations
+Next, we will compare the associations identified using the GSC and GSO methods with the associations identified using text mining. Since the text-mining identifies cell types affected by a disease, as well as cell types causing a disease, these associations cannot be considered gold standards. In Cornish et al. (2015), we show that the GSC method works best for diseases with 6 or more associated genes. For this reason, we remove diseases with fewer associated genes.
 
 ```{r load_pvalues}
 # load the associations
@@ -291,11 +246,12 @@ data(pvalues.gsc)
 data(pvalues.gso)
 data(pvalues.text)
 
-# ensure that the rows and columns of the matrices are ordered the same
-diseases <- rownames(pvalues.gsc)
-cell.types <- colnames(pvalues.gsc)
-pvalues.gso <- pvalues.gso[diseases, cell.types]
-pvalues.text <- pvalues.text[diseases, cell.types]
+# keep associations for diseases with 6 or more associated genes
+data(disease.genes)
+diseases <- names(disease.genes)[sapply(disease.genes, length) >= 6]
+pvalues.gsc <- pvalues.gsc[diseases, ]
+pvalues.gso <- pvalues.gso[diseases, ]
+pvalues.text <- pvalues.text[diseases, ]
 ```
 
 We next adjust the p-values using the Benjamini-Hochberg (BH) procedure for multiple testing:
@@ -311,20 +267,18 @@ We can then compare the association overlap at a false discovery rate (FDR) of 1
 
 ```{r compare_associations}
 # count the number of associations supported by text
-res <- matrix(NA, 2,2, dimnames=list(c("supported by text", "not supported by text"), c("GSO", "GSC")))
+res <- matrix(NA, 2,2, dimnames=list(c("supported", "not supported"), c("GSO", "GSC")))
 cutoff <- 0.10
-res["supported by text", "GSO"] <- sum(pvalues.adj.gso < cutoff & pvalues.adj.text < cutoff)
-res["supported by text", "GSC"] <- sum(pvalues.adj.gsc < cutoff & pvalues.adj.text < cutoff)
-res["not supported by text", "GSO"] <- sum(pvalues.adj.gso < cutoff & !pvalues.adj.text < cutoff)
-res["not supported by text", "GSC"] <- sum(pvalues.adj.gsc < cutoff & !pvalues.adj.text < cutoff)
+res["supported", "GSO"] <- sum(pvalues.adj.gso <= cutoff & pvalues.adj.text <= cutoff)
+res["supported", "GSC"] <- sum(pvalues.adj.gsc <= cutoff & pvalues.adj.text <= cutoff)
+res["not supported", "GSO"] <- sum(pvalues.adj.gso <= cutoff & !pvalues.adj.text <= cutoff)
+res["not supported", "GSC"] <- sum(pvalues.adj.gsc <= cutoff & !pvalues.adj.text <= cutoff)
 res
 ```
 
 
-
 ### Creating the cell type diseasome
-
-We are able to create a cell type-based diseasome using the associations identified by the GSC method. This is done by measuring the correlation between pairs of diseases, with respect to the -log10 of their cell type association p-values, then connecting each disease to the four diseases with which it correlates most strongly. A value of four was chosen to aid in visual interpretation of the results. However, other values can also be used.
+We are able to create a cell type-based diseasome using the disease-cell type associations identified. This is done by measuring the correlation between pairs of diseases, with respect to the -log10 of their cell type association p-values, then connecting each disease to the diseases with which it correlates most strongly. In Cornish et al. (2015), we chose to connect each disease to the four diseases with which it correlated most strongly, to aid in the visual interpretation of the diseasome. However, other values can also be used.
 
 In order to visualise the clustering of similar diseases, we colour diseases by their disease class, obtained from the MeSH databases and saved within the package.
 
@@ -336,7 +290,7 @@ data(disease.classes)
 disease.cols <- c("Cardiovascular Diseases", "Digestive System Diseases", "Immune System Diseases", "Mental Disorders", "Nervous System Diseases", "Nutritional and Metabolic Diseases", "Respiratory Tract Diseases", "Skin and Connective Tissue Diseases", "Urogenital Diseases and Pregnancy Complications")
 col.other <- "white"
 
-# set colours for each disease class
+# set colour for each disease class
 classes <- sort(unique(disease.classes))
 cols <- rep(col.other, length(classes))
 names(cols) <- classes
@@ -346,15 +300,13 @@ for (i in 1:length(disease.cols)) cols[disease.cols[i]] <- rainbow(length(diseas
 disease.cols <- cols[disease.classes]
 names(disease.cols) <- names(disease.classes)
 
-# create cell type diseasome
+# create the diseasome
 project.network(pvalues.adj.gsc[names(disease.cols), ], col.vert=disease.cols, col.other=col.other, vert.size.max=5, vert.label.cex=0.6, edge.width.max=5, layout=layout.fruchterman.reingold) 
-project.network.legend(classes.cols, col.other)
+project.network.legend(cols, col.other)
 ```
 
 
-
 ### Extracting a cell type-specific disease gene subgraph
-
 In this section, we will extract a subgraph of psoriasis-associated genes from a monocyte-specific interactome. This will include the psoriasis-associated genes and their interacting partners. We first construct the monocyte-specific interactome. 
 
 ```{r create_monocyte_interactome}
@@ -370,16 +322,15 @@ expression <- expression.transform(expression.fantom5)
 g.monocyte <- score.edges(g, expression[, "monocyte"])
 ```
 
-Next, we identify the psoriasis-associated genes. To aid in visual interpretation of the subgraph, only those psoriasis-associated genes with 15 or fewer interacting partners will be included.
+Next, we identify the psoriasis-associated genes. To aid in visual interpretation of the subgraph, psoriasis-associated genes more than 15 interacting partners are excluded.
 
 ```{r identify_disease_genes}
 # identify all psoriasis-associated genes
 data(disease.genes)
 psoriasis.genes <- disease.genes[["psoriasis"]]
 
-# remove genes not present in network and for which we have no expression data
+# remove genes not present in the network
 psoriasis.genes <- psoriasis.genes[psoriasis.genes %in% V(g.monocyte)$name]
-psoriasis.genes <- psoriasis.genes[psoriasis.genes %in% rownames(expression)]
 
 # remove genes with more than 15 interacting partners
 psoriasis.genes <- psoriasis.genes[degree(g.monocyte)[psoriasis.genes] <= 15]
@@ -389,15 +340,13 @@ We can now use the **disease.subgraph** function to produce a monocyte-specific 
 
 ```{r psoriasis_subgraph}
 # produce psoriasis subgraph
-# in the paper, 500 bins, rather than 20 are used
-g.subgraph <- disease.subgraph(g.monocyte, psoriasis.genes, n.bins=20, edge.width.max=10)
+g.subgraph <- disease.subgraph(g.monocyte, psoriasis.genes, n.bins=500, edge.width.max=10)
 plot(g.subgraph)
 ```
 
 In this plot, edges are weighted and coloured by their score, so that edges that are more likely to occur in monocytes are thick and dark blue. Vertices are coloured by the expression score of their respective gene, so that genes that are highly overexpressed in monocytes are coloured black. Square vertices represent disease genes and circle vertices represent their interacting partners.
 
-In this plot, many of the disease-associated genes are strongly connected by monocyte-upweighted interactions, suggesting a pathway through which they may effect the development of the disease in monocytes. 
-
+In this plot, many of the disease-associated genes are strongly connected by monocyte-upweighted interactions, suggesting a pathway through which they may affect the development of the disease in monocytes. 
 
 
 ## Session information
@@ -409,12 +358,11 @@ sessionInfo()
 
 
 ## References
-
-Our paper under preparation.
-
 Bauer-Mehren A, Rautschka M, Sanz F, Furlong LI (2010) DisGeNET: a Cytoscape plugin to visualize, integrate, search and analyze gene-disease networks. Bioinformatics 26(22):2924-2926.
 
 Cornish AJ, Markowetz F (2014) SANTA: Quantifying the Functional Content of Molecular Networks. PLoS Comput Biol 10(9):e1003808.
+
+Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. (Under Revision)
 
 Csardi G, Napusz T (2006) The igraph software package for complex network research. Inter Journal Complex Systems p. 1695.
 
@@ -424,10 +372,6 @@ Franceschini A et al. (2013) STRING v9.1: protein-protein interaction networks, 
 
 Glaab E, Baudot A, Krasnogor N, Valencia A (2010) Extending pathways and processes using molecular interaction networks to analyse cancer genome data. BMC Bioinformatics 11:597.
 
-Hamosh A, Scott AF, Amberger JS, Bocchini Ca, McKusick Va (2005) Online Mendelian Inheritance in Man (OMIM), a knowledgebase of human genes and genetic disorders. Nucleic Acids Res 33:514-7.
-
 Kohler S, Bauer S, Horn D, Robinson P (2008) Walking the interactome for prioritization of candidate disease genes. Am J Hum Genet 82:949-958.
-
-Magger O, Waldman YY, Ruppin E, Sharan R (2012) Enhancing the prioritization of disease-causing genes through tissue specific protein interaction networks. PLoS Comput Biol 8(9):e1002690.
 
 Sardar AJ et al. (2014) The evolution of human cells in terms of protein innovation. Mol Biol Evol 31(6):1364-1374.

@@ -12,4 +12,4 @@ Description: This package provides 2 methods for identifying disease-cell type a
 License: GPL (>= 2)
 LazyLoad: yes
 VignetteBuilder: knitr
-Packaged: 2015-06-05 11:11:14 UTC; alex
+Packaged: 2015-06-07 15:05:01 UTC; alex
