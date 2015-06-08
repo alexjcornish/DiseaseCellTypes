@@ -38,7 +38,7 @@ References
 
 Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. (Under Revision)
 
-[1]: https://cdn.rawgit.com/alexjcornish/DiseaseCellTypes/master/inst/doc/DiseaseCellTypes-vignette.html?raw=TRUE
+[1]: https://cdn.rawgit.com/alexjcornish/DiseaseCellTypes/458bbd8653bba2fbf1a1194ab1dc8fbb1113fbd0/inst/doc/DiseaseCellTypes-vignette.html
 [2]: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
 [3]: http://alexjcornish.github.io/Disease_Cell_Association_Data/
 [4]: http://alexjcornish.github.io/Cell_Type_Interactomes/
