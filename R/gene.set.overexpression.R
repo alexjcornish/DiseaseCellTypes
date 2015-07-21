@@ -20,6 +20,7 @@ gene.set.overexpression <- function(
     res$obs <- sapply(cell.types, function(cell.type) gso.sub(expression[, cell.type], genes))
     if (n.perm) {
         expression.perm <- sapply(1:n.perm, function(i) expression[cbind(1:nrow(expression), sample(as.integer(1:ncol(expression)), nrow(expression), replace=T))])
+        if (is.null(dim(expression.perm))) expression.perm <- array(expression.perm, dim=c(1, n.perm), dimnames=list(genes, NULL))
         rownames(expression.perm) <- rownames(expression)
         res$perm <- sapply(1:n.perm, function(i) gso.sub(expression.perm[, i], genes)) 
     }

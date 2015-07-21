@@ -1,4 +1,10 @@
-DiseaseCellTypes 0.9.0 (2014-12-09)
+version 0.10.1 (2015-07-21)
+---------------------------
+NOTES: 
+	- GSO method fixed to run with 1 associated gene.
+	
+
+version 0.9.0 (2014-12-09)
 ---------------------------
 NOTES: 
 	- First version of the DiseaseCellTypes package.
