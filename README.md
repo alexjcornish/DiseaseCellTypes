@@ -36,7 +36,7 @@ install_github("alexjcornish/DiseaseCellTypes")
 References
 ----------
 
-Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. (Under Revision)
+[Cornish A.J., Filippis I., David A. and Sternberg M.J.E. (2015) Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types. Genome Medicine, 7:95][8]
 
 [1]: https://cdn.rawgit.com/alexjcornish/DiseaseCellTypes/458bbd8653bba2fbf1a1194ab1dc8fbb1113fbd0/inst/doc/DiseaseCellTypes-vignette.html
 [2]: https://github.com/alexjcornish/DiseaseCellTypes/blob/master/inst/doc/DiseaseCellTypes-manual.pdf?raw=TRUE
@@ -45,3 +45,4 @@ Cornish AJ, Filippis I, David A and Sternberg MJE (2015) Exploring the cellular 
 [5]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.tgz?raw=TRUE
 [6]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.zip?raw=TRUE
 [7]: https://github.com/alexjcornish/DiseaseCellTypes_Binaries/blob/master/DiseaseCellTypes_0.10.0.tar.gz?raw=TRUE
+[8]: http://genomemedicine.com/content/7/1/95
