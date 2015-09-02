@@ -131,13 +131,16 @@ V(g.neuron)$expression[1:5]
 data(pvalues.gsc)
 
 # compute the -log10 of the p-values
-pvalues.ml10 <- -log10(pvalues.gsc)
+
+# adjust p-values for multiple testing
+pvalues.adj.gsc <- array(p.adjust(as.vector(pvalues.gsc), method="BH"), dim=dim(pvalues.gsc), dimnames=dimnames(pvalues.gsc))
+pvalues.ml10 <- -log10(pvalues.adj.gsc)
 
 # plot heatmap
 require(gplots)
 n.cols <- 500
 cols <- colorRampPalette(c("#D3DDDC", "#02401B"))(n.cols)
-col.breaks <- c(0, seq(-log10(0.05), max(pvalues.ml10), length.out=n.cols))
+col.breaks <- c(0, seq(-log10(0.1), max(pvalues.ml10), length.out=n.cols))
 heatmap.2(pvalues.ml10[1:10, 1:10], Rowv=TRUE, Colv=TRUE, dendrogram="both", breaks=col.breaks, col=cols, notecol="black", trace="none", margins=c(18,15), key=TRUE, density.info="none")
 
 ## ----load_pvalues--------------------------------------------------------

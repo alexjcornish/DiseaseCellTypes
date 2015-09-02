@@ -20,13 +20,13 @@ project.network.legend(col.classes, col.other="white", pt.cex=3, \dots)
 }
 }
 \details{
-Create a legend of classes. Classes of the same color can be combined under an 'Other' class if they all have the same color as \code{col.other}.
+Create a legend of classes. Classes of the same color can be combined under an 'Other' class if they share the color specified by \code{col.other}.
 }
 \author{
 Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 }
 \references{
-Paper in preparation.
+Cornish, A.J., Filippis, I., David, A. and Sternberg, M.J.E. (2015) \emph{Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types.} Genome Medicine. 7:95.
 }
 \seealso{
 \code{\link[DiseaseCellTypes:project.network]{project.network}}

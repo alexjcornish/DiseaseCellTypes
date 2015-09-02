@@ -1,15 +1,16 @@
 Package: DiseaseCellTypes
 Type: Package
-Title: Identify disease-cell type associations using GSC and GSO
-Version: 0.10.1
-Date: 21 July 2015
+Title: Identify disease-cell type associations
+Version: 0.10.2
+Date: 01 September 2015
 Author: Alex J. Cornish
 Maintainer: Alex J. Cornish <a.cornish12@imperial.ac.uk>
 Depends: R (>= 2.14), igraph
 Imports: gplots, Matrix, psych, snow, stringr
 Suggests: BiocGenerics, formatR, knitr, RUnit
-Description: This package provides 2 methods for identifying disease-cell type associations: gene set compactness (GSC) and gene set overexpression (GSO). Also provided are functions for building cell type-specific interactomes, cell type-based diseasomes and simulating random walks across networks.
+Description: This package provides 2 methods for identifying disease-cell type associations: gene set compactness (GSC) and gene set overexpression (GSO). Also provided are functions for building cell-type-specific interactomes and cell-type-based diseasomes.
 License: GPL (>= 2)
 LazyLoad: yes
 VignetteBuilder: knitr
-Packaged: 2015-06-07 15:05:01 UTC; alex
+Packaged: 2015-09-02 08:09:56 UTC; alex
+NeedsCompilation: no

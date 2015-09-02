@@ -1,43 +1,43 @@
 \name{gene.set.compactness}
 \alias{gene.set.compactness}
 \title{
-Run the gene set compactness (GSC) method
+Run the gene set compactness method
 }
 \description{
-Identify associations between sets of disease-associated genes and cell types using the gene set compactness method.
+Identify disease-cell-type associations using the gene set compactness (GSC) method.
 }
 \usage{
 gene.set.compactness(expression, genes, g, n.perm=10000, expression.miss=median(expression), 
     rwr.r=0.7, rwr.cutoff=1e-5, parallel=NULL, verbose=TRUE)
 }
 \arguments{
-  \item{expression}{Numeric matrix. Matrix of percentile-transformed relative expression scores. Rows should represent genes and be named with the gene name. Columns should represent contexts (i.e. cell types) and be named with the context name. \code{expression} should contain at least 2 columns and can be produced using the \code{expression.transform} function. 
+  \item{expression}{Numeric matrix. Matrix of percentile-normalised relative gene expression scores. Rows should represent genes and be named with the gene name. Columns should represent contexts (i.e. cell types) and be named with the context name. \code{expression} should contain at least 2 columns and can be produced using the \code{expression.transform} function. 
 } 
-  \item{genes}{Character vector. The names of the genes in the gene set to test. 
+  \item{genes}{Character vector. The names of the disease-associated genes.
 }
-  \item{g}{\code{igraph} object. The PPI network used to created the observed and permuted interactomes. Gene names should be stored under a vertex attribute named \code{name}.
+  \item{g}{\code{igraph} object. The PPI network used to created the context-specific interactomes. Gene names should be stored under a vertex attribute named \code{name}.
 }
   \item{n.perm}{Numeric scalar. Number of permutations to complete.
 }
-  \item{expression.miss}{Numeric scalar. The expression score to give to genes not present in \code{expression}.
+  \item{expression.miss}{Numeric scalar. The expression score given to genes not present in \code{expression}.
 }
-  \item{rwr.r}{Numeric scalar. The probability under which random walks restart.
+  \item{rwr.r}{Numeric scalar. The RWR restart probability.
 }
-  \item{rwr.cutoff}{Numeric scalar. The value used to determine when the iterative algorithm used to compute the random walk with restart distances terminates.
+  \item{rwr.cutoff}{Numeric scalar. The value used to determine when the iterative algorithm used to compute the RWR distances terminates.
 }
   \item{parallel}{Numeric scalar or \code{NULL}. If a numeric scalar and parallel computing is available then this value determines the number of cores that the computation will be split over. See the \code{snow} package for further details.
 }
-  \item{verbose}{Logical. If \code{TRUE}, then messages about the progress of the function are displayed. 
+  \item{verbose}{Logical. If \code{TRUE} then messages about the progress of the function are displayed. 
 }
 }
 \details{
-Use a permutation-based approach to identify context-specific interactomes in which a set of genes are significantly more compact. The compactness score is defined by Glaab et al. as the mean distance between pairs of vertices in a set of vertices. Here, we use random walks with restart (RWR) to compute the distance between vertex pairs, similar to the method described by Kohler et al. \code{rwr.r} determines the probability that a random walker will return to the start node, while \code{rwr.cutoff} determines when the iterative process will terminate (as described for the \code{distance.rwr} function).
+Use a permutation-based approach to identify context-specific interactomes in which a set of genes are significantly more compact than expected by chance. The compactness score is defined by Glaab et al. as the mean distance between pairs of vertices in a set of vertices. Here, we use the random walk with restart (RWR) method to compute the distances between vertex pairs, as described by Kohler et al. \code{rwr.r} determines the probability that a random walker will return to the start node, while \code{rwr.cutoff} determines when the iterative process will terminate (as described for the \code{distance.rwr} function).
 
-Context-specific interactomes are created within the function by integrating expression and protein-protein interaction (PPI) data (\code{g}). Edges are re-scored using the product of the expression scores of the interactors. Expression data should represent percentile-normalised relative expression scores, created using the \code{expression.transform} function. The context-specific interactomes are not output by this function, but can be created separately using the \code{score.edges} function. 
+Context-specific interactomes are generated within the function by integrating expression and protein-protein interaction (PPI) data (\code{g}). Edges are re-scored using the product of the expression scores of the interactors. Expression data should represent percentile-normalised relative gene expression scores, created using the \code{expression.transform} function. The context-specific interactomes are not output by this function, but can be created separately using the \code{score.edges} function. 
 
-Observed interactomes are created for each context in \code{expression}. \code{n.perm} permuted interactomes are created by permuting the expression scores, then using these permuted profiles to create permuted interactomes. Empirical p-values, describing whether the gene set is significantly more compact on any of the observed interactomes, are produced for each context by computing the number of permuted compactness scores smaller than each observed compactness score.
+Observed interactomes are created for each context in \code{expression}. \code{n.perm} permuted interactomes are created by permuting the expression scores, then using these permuted profiles to create permuted interactomes. Empirical p-values, describing whether the gene set is significantly more compact on any of the observed interactomes than expected by chance given the PPI data used to created the interactomes, are produced for each context by counting the number of permuted interactomes in which the compactness score is smaller than the compactness score in each observed interactome.
 
-Contexts can represent a range of biological entities, including cell types, tissues and disease states. This method is refered to as the `gene set compactness' method in the associated paper.
+Contexts can represent a range of biological contexts, including cell types, tissues and disease states. This method is refered to as the `gene set compactness' method in Cornish et al. (2015).
 }
 \value{
 A object of class \code{dct}. This object is a list and contains the following elements
@@ -52,13 +52,13 @@ A object of class \code{dct}. This object is a list and contains the following e
 Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 }
 \references{
-Paper in preparation
-
-Glaab, E., Baudot A., Krasnogor N. and Valencia A. (2010). \emph{Extending pathways and processes using molecular interaction networks to analyse cancer genome data.} BMC Bioinformatics. 11(1): 597:607.
-
-Kohler, S., Bauer, S., Horn, D. et al. (2008) \emph{Walking the interactome for prioritization of candidate disease genes.} The American Journal of Human Genetics. 82, 949-958.
+Cornish, A.J., Filippis, I., David, A. and Sternberg, M.J.E. (2015) \emph{Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types.} Genome Medicine. 7:95.
 
 Cornish, A.J. and Markowetz, F. (2014) \emph{SANTA: Quantifying the Functional Content of Molecular Networks.}. PLOS Computational Biology. 10:9, e1003808.
+
+Glaab, E., Baudot A., Krasnogor N. and Valencia A. (2010) \emph{Extending pathways and processes using molecular interaction networks to analyse cancer genome data.} BMC Bioinformatics. 11(1): 597:607.
+
+Kohler, S., Bauer, S., Horn, D. et al. (2008) \emph{Walking the interactome for prioritization of candidate disease genes.} The American Journal of Human Genetics. 82, 949-958.
 }
 \seealso{
 \code{\link[DiseaseCellTypes:expression.transform]{expression.transform}},

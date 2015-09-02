@@ -1,18 +1,18 @@
 \name{gene.set.overexpression}
 \alias{gene.set.overexpression}
 \title{
-Compute gene set overexpression significance
+Run the gene set overexpression method
 }
 \description{
-Identify associations between sets of disease-associated genes and context (i.e. cell types) using the gene set overexpression method.
+Identify disease-cell-type associations using the gene set overexpression (GSO) method.
 }
 \usage{
 gene.set.overexpression(expression, genes, n.perm=10000, expression.miss=median(expression))
 }
 \arguments{
-  \item{expression}{Numeric matrix. Matrix of percentile-transformed relative expression scores. Rows should represent genes and be named with the gene name. Columns should represent contexts (i.e. cell types) and be named with the context name. \code{expression} should contain at least 2 columns and can be produced using the \code{expression.transform} function. 
+  \item{expression}{Numeric matrix. Matrix of percentile-normalised relative gene expression scores. Rows should represent genes and be named with the gene name. Columns should represent contexts (i.e. cell types) and be named with the context name. \code{expression} should contain at least 2 columns and can be produced using the \code{expression.transform} function. 
 }
-  \item{genes}{Character vector. The names of the genes in the gene set to test. 
+  \item{genes}{Character vector. The names of the disease-associated genes.
 }
   \item{n.perm}{Numeric scalar. Number of permutations to complete.
 }
@@ -20,9 +20,9 @@ gene.set.overexpression(expression, genes, n.perm=10000, expression.miss=median(
 }
 }
 \details{
-Use a permutation-based appraoch to identify contexts (i.e. cell types) in which sets of genes are overexpressed. Permuted expression profiles are created by randomly redistributing the expression scores of each gene between contexts. The mean expression score of the genes in \code{genes} is computed for each observed expression profile and the permuted expression profiles. An empirical p-value, based on the number of permuted mean scores greater than each observed mean scores, is produced for each context. 
+Use a permutation-based appraoch to identify contexts (i.e. cell types) in which sets of genes are overexpressed. Permuted expression profiles are created by randomly redistributing the expression scores of each gene between contexts. The mean expression score of the genes in \code{genes} is computed for each observed and permuted expression profile. An empirical p-value is produced describing the probability that a set of disease-associated genes is as overexpressed as obsered in a profile by chance is produced by counting the number of permuted profiles in which the mean expression score of the genes is greater than the mean expression score of the genes in the observed profile.
 
-Expression data should represent percentile-normalised relative expression scores, possibly created using the \code{expression.transform} function. Contexts can represent are range of biological entities, including cell types, tissues and disease states. This method is refered to as the `gene set overexpression' method in the associated paper.
+Expression data should represent percentile-normalised relative expression scores, possibly created using the \code{expression.transform} function. Contexts can represent are range of biological entities, including cell types, tissues and disease states. This method is refered to as the `gene set overexpression' method in Cornish et al. (2015).
 }
 \value{
 A object of class \code{dct}. This object is a list and contains the following elements
@@ -37,7 +37,7 @@ A object of class \code{dct}. This object is a list and contains the following e
 Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 }
 \references{
-Paper in preparation
+Cornish, A.J., Filippis, I., David, A. and Sternberg, M.J.E. (2015) \emph{Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types.} Genome Medicine. 7:95.
 }
 \seealso{
 \code{\link[DiseaseCellTypes:expression.transform]{expression.transform}},

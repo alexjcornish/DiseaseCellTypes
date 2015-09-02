@@ -1,10 +1,10 @@
 \name{project.network}
 \alias{project.network}
 \title{
-Plot a network built from p-value correlations.
+Generate and plot a diseasome from a matrix of p-values.
 }
 \description{
-Produce and plot a correlation network from a matrix of p-values, such as the diseasome in the associated paper.
+Generate and plot a diseasome from a matrix of p-values.
 }
 \usage{
 project.network(p.values, col.vert=NULL, col.other="white", 
@@ -13,9 +13,9 @@ project.network(p.values, col.vert=NULL, col.other="white",
     edge.width.max=10, edge.col.diff="lightgrey", \dots)
 }
 \arguments{
-  \item{p.values}{Numeric matrix. The p-values. Each row becomes a vertex in the network. 
+  \item{p.values}{Numeric matrix. The p-values or q-values. Each row becomes a vertex in the network. 
 }
-  \item{col.vert}{Named character vector. The color of each vertex in any format accepted by \code{xspline} (colors in RGB, numeric color IDs or symbolic color names). Names must be the same as the rownames of \code{p.values}. If \code{NULL}, then all vertices colored using \code{col.other}. 
+  \item{col.vert}{Named character vector. The color of each vertex in any format accepted by \code{xspline} (colors in RGB, numeric color IDs or symbolic color names). Names must be the same as the rownames in \code{p.values}. If \code{NULL} then all vertices colored using \code{col.other}. 
 }
   \item{col.other}{Character scalar. If \code{col.vert} is \code{NULL}, or the color of a vertex is \code{NA} or \code{'other'}, then the vertex is colored this color. 
 }
@@ -25,40 +25,38 @@ project.network(p.values, col.vert=NULL, col.other="white",
 }
   \item{vert.size.max}{Numeric scalar. The maximum size of the vertices.
 }
-  \item{vert.p.cutoff}{Numeric scaler. The p-value cutoff used identify associations for vertex sizes.
+  \item{vert.p.cutoff}{Numeric scaler. The p-value or q-value cutoff used to identify associations for vertex sizes.
 }
   \item{vert.label.cex}{Numeric scalar. The size of the vertex labels.
 }
   \item{edge.width.max}{Numeric scalar. The maximum width of the edges.
 }
-  \item{edge.col.diff}{Character scalar. The color of edges between vertices of different colors.
+  \item{edge.col.diff}{Character scalar. The color of edges between vertices of different classes.
 }
   \item{\dots}{Additional arguments to be passed to \code{plot.igraph}.
 }
 }
 \details{
-Plot a correlation network computed from a matrix of p-values. The -log10 of p-values is first computed, then the correlation between rows computed using the method specified in \code{method.cor}. A vertex is created for each of the rows in \code{p.values}. Each vertex is connected to the \code{rank.max} vertices it correlates most strongly with. Vertices are sized by the number of significant associations they are involved in. Edge widths represent the strength of the correlation.
+Plot a diseasome computed from a matrix of p-values. The -log10 of p-values is first computed, then the correlation between the rows computed using the method specified by \code{method.cor}. A vertex is created for each of the rows in \code{p.values}. Each vertex is connected to the \code{rank.max} vertices with which it correlates most strongly. Vertices are sized by the number of significant associations they are involved in. Edge widths represent the strength of the correlation.
 
 Vertices are colored according to \code{col.vert}. If an edge connects two vertices of different color, then it is colored \code{edge.col.diff}. If an edge connects two vertices of the same color, then it is also colored this color. 
 
-The correlation network is returned by the function (invisibly).
-
-This function is used to create the diseasome in the associated paper.
+This function is used to create the diseasome in Cornish et al. (2015).
 }
 \value{
-The computed correlation network in the form of an \code{igraph} object.
+An \code{igraph} object. The computed diseasome.
 }
 \author{
 Alex J. Cornish \email{a.cornish12@imperial.ac.uk}
 }
 \references{
-Paper in preparation.
+Cornish, A.J., Filippis, I., David, A. and Sternberg, M.J.E. (2015) \emph{Exploring the cellular basis of human disease through a large-scale mapping of deleterious genes to cell types.} Genome Medicine. 7:95.
 }
 \seealso{
 \code{\link[DiseaseCellTypes:project.network.legend]{project.network.legend}}
 }
 \examples{
-# simulate p-values and create correlation network
+# simulate p-values and create a diseasome.
 n.diseases <- 5
 n.cells <- 6
 disease.names <- paste("disease", 1:n.diseases)
